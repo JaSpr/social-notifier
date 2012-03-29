@@ -1,0 +1,88 @@
+#############
+### ABOUT ###
+#############
+
+This application was written and tested for ruby1.9.2 and is designed to
+work in conjunction with the libnotify notification daemon to display a
+notification on the desktop whenever a new tweet is listed in your twitter
+timeline.
+
+One running instance of the daemon can contain multiple and mixed feeds
+from which to retrieve updates.
+
+Future goals are to allow for rss/atom feeds and Facebook feeds as well.
+
+
+#####################
+### PREREQUISITES ###
+#####################
+
+To use this application in its present state, you must have the following
+gems installed: (use commands below).
+
+    sudo gem install libnotifier
+    sudo gem install twitter
+
+*** Following facebook feeds isn't working right now, as the offline_access
+*** token is being deprecated.
+
+    sudo gem install fb_graph
+
+*** config-dist.rb must be filled out and renamed as config.rb for the
+*** application to run, and you must fill out your twitter settings in
+*** that file (follow the instructions in that file) to access the
+*** Twitter API
+
+
+####################
+### INSTRUCTIONS ###
+####################
+
+
+### STARTING THE DAEMON:
+
+    ruby application.rb start
+
+
+### ADDING REQUESTS TO THE STACK:
+
+    ruby application.rb add twitter home
+    ruby application.rb add twitter list [list-owner] [list]
+    ruby application.rb add twitter search keyword
+    ruby application.rb add twitter search "key words"
+
+Those command all return a numbered list of requests in your stack,
+but you can directly query the stack without adding any new requests...
+
+
+### LISTING REQUESTS IN THE STACK:
+
+    ruby application.rb list
+
+
+### DELETING REQUESTS FROM THE STACK:
+
+    ruby application.rb delete [entry number]
+
+After deletion, the entry number will not be reused, so running the command
+twice won't delete another entry.
+
+
+### STOPPING THE DAEMON:
+
+    ruby application.rb stop
+
+
+#################
+### DEBUGGING ###
+#################
+
+A storage directory is created in your home directory in a directory named
+.social-notifier .  This directory contains a subdirectory 'log' which
+contains the application log ( everything purposefully logged to the output )
+and the debug log, which is lists ruby debug messages.
+
+tail -f ~/.social-notifier/log/*
+
+Additionally, a twitter-images folder is created to store Twitter user images
+so that they can be displayed with the tweet notification.
