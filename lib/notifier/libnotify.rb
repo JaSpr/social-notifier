@@ -1,7 +1,7 @@
 require 'libnotify'
 require_relative '../notifier'
 
-module Social_Notifier
+module SocialNotifier
   class Notifier
 
     # Sends a notification to libnotify

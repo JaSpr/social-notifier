@@ -1,8 +1,8 @@
 #! /usr/bin/ruby -wW2d
-module Social_Notifier
+module SocialNotifier
   class Request
 
-    attr_accessor :keyword, :list_owner, :list_slug
+    attr_accessor :type
 
     #
     # Initialize the object

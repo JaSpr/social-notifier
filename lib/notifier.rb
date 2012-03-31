@@ -1,5 +1,5 @@
 
-module Social_Notifier
+module SocialNotifier
   class Notifier
 
      def send(message_title, message_body, options={})

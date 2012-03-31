@@ -2,8 +2,8 @@
 
 require_relative '../request'
 
-module Social_Notifier
-  class FacebookRequest < Social_Notifier::Request
+module SocialNotifier
+  class FacebookRequest < SocialNotifier::Request
 
     def type
       "Facebook"
@@ -17,7 +17,7 @@ module Social_Notifier
     #
     def initialize(notifier_engine, params=nil)
 
-      raise ArgumentError, "Notifier engine must be instance of Social_Notifier::Engine" unless notifier_engine.is_a? Social_Notifier::Engine
+      raise ArgumentError, "Notifier engine must be instance of SocialNotifier::Engine" unless notifier_engine.is_a? SocialNotifier::Engine
 
       if params and params.is_a? Enumerable
         params.each do |key, value|

@@ -2,7 +2,7 @@
 require 'etc'
 require 'net/http'
 
-module Social_Notifier
+module SocialNotifier
   class Engine
 
     #
@@ -52,8 +52,8 @@ module Social_Notifier
       $stdout.reopen(application_log_file, "a")
       $stdout.sync = true
 
-      @messenger = Social_Notifier::Messenger.new self, true
-      @notifier  = Social_Notifier::Notifier.new
+      @messenger = SocialNotifier::Messenger.new self, true
+      @notifier  = SocialNotifier::Notifier.new
 
       log ""
       log "****************************"
@@ -88,7 +88,7 @@ module Social_Notifier
     #
     def init_child(method, params)
 
-      @messenger = Social_Notifier::Messenger.new self, false
+      @messenger = SocialNotifier::Messenger.new self, false
 
       params.unshift method
 
@@ -121,7 +121,7 @@ module Social_Notifier
               if response.is_a? Exception
                 log "API Exception: #{response.class}: #{response.message}"
               elsif response.is_a? Array and response.first
-                log "Retrieved #{response.length} new status update(s)."
+                log "Retrieved #{response.length} new #{request.type} update(s)."
                 @statuses = response + @statuses
               end
 
@@ -196,8 +196,8 @@ module Social_Notifier
               params: params
           }
 
-          @requests.push eval("Social_Notifier::#{request_service.capitalize}Request").new self, request_params
-          #@requests.push Social_Notifier::FacebookRequest.new self, request_params
+          @requests.push eval("SocialNotifier::#{request_service.capitalize}Request").new self, request_params
+          #@requests.push SocialNotifier::FacebookRequest.new self, request_params
 
         when :delete
            if params.first and @requests[params.first.to_i]

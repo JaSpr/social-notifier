@@ -2,8 +2,8 @@
 
 require_relative '../request'
 
-module Social_Notifier
-  class TwitterRequest < Social_Notifier::Request
+module SocialNotifier
+  class TwitterRequest < SocialNotifier::Request
 
     attr_accessor :keyword, :list_owner, :list_slug
 
@@ -20,7 +20,7 @@ module Social_Notifier
     def initialize(notifier_engine, params=nil)
 
       # We use the notifier engine object to write to the log file.
-      raise ArgumentError, "Notifier engine must be instance of Social_Notifier::Engine" unless notifier_engine.is_a? Social_Notifier::Engine
+      raise ArgumentError, "Notifier engine must be instance of SocialNotifier::Engine" unless notifier_engine.is_a? SocialNotifier::Engine
 
       # Turn the parameters into instance variables so that we can reference them any time.
       if params and params.is_a? Enumerable

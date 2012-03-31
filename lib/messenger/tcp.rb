@@ -2,20 +2,20 @@ require 'socket'
 
 require_relative '../messenger'
 
-module Social_Notifier
+module SocialNotifier
   class Messenger
 
     #
     # Initialize the Class
     #
-    # @param notifier_engine [Social_Notifier::Engine]
+    # @param notifier_engine [SocialNotifier::Engine]
     # @param is_listener [Boolean]
     # @raise [ArgumentError]
     # @return [Void]
     #
     def initialize(notifier_engine, is_listener)
 
-      raise ArgumentError, "Notifier Object must be instance of Social_Notifier::Engine" unless notifier_engine.is_a? Social_Notifier::Engine
+      raise ArgumentError, "Notifier Object must be instance of SocialNotifier::Engine" unless notifier_engine.is_a? SocialNotifier::Engine
 
       @notifier_engine = notifier_engine
 
@@ -41,7 +41,7 @@ module Social_Notifier
       begin
         server  = TCPSocket.open('localhost', 3456)
       rescue Exception => e
-        @notifier_engine.log "Could not connect to Social_Notifier server process"
+        @notifier_engine.log "Could not connect to SocialNotifier server process"
         @notifier_engine.log "#{e.class}: #{e.message}"
       end
 
