@@ -39,7 +39,6 @@ module SocialNotifier
       validate_parameters
 
       @past_entries    = []
-      @response        = nil
       @notifier_engine = notifier_engine
 
       SimpleRSS.item_tags << ":feedburner:origLink"
@@ -61,9 +60,9 @@ module SocialNotifier
     # Processes the responses from the API and returns them properly
     # @return [Hash|Exception|Array<Void>]
     #
-    def process_response
-      if @response and @response.is_a? Array
-        final_response = @response.map do |entry|
+    def process_response(response)
+      if response and response.is_a? Array
+        final_response = response.map do |entry|
 
           # Don't return the same entry on subsequent calls
           if @past_entries.member? entry.id
@@ -92,9 +91,9 @@ module SocialNotifier
         # Return the processed response, removing nil entries.
         final_response.compact
 
-      elsif @response and @response.is_a? Exception
+      elsif response and response.is_a? Exception
         # return the exception
-        @response
+        response
       else
         # return an empty array
         []

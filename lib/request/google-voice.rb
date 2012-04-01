@@ -128,7 +128,7 @@ module SocialNotifier
           end
 
         end
-
+        @messages = nil
         # Remove any invalid entries that were marked as nil
         final_response.compact
 
@@ -264,7 +264,7 @@ module SocialNotifier
       document = document.gsub(/.*<html>/m, '<html>')
 
       # re-parse resulting html
-      document =  Nokogiri.XML(document)
+      Nokogiri.XML(document)
     end
 
   end

@@ -22,21 +22,20 @@ module SocialNotifier
     def initialize(type, html)
 
       @type = type
-      @html = html
 
       @message_data = nil
 
-      process_html
+      process_html html
 
     end
 
-    def process_html
-      @id      = @html.attr('id')
-      @contact = @html.css('.gc-message-name a').text.strip
-      @time    = @html.css('.gc-message-relative').text.strip
+    def process_html(html)
+      @id      = html.attr('id')
+      @contact = html.css('.gc-message-name a').text.strip
+      @time    = html.css('.gc-message-relative').text.strip
 
       if @type == :sms
-        @messages = @html.css('.gc-message-sms-row').map do |sms|
+        @messages = html.css('.gc-message-sms-row').map do |sms|
           [
               sms.css('.gc-message-sms-from').text.strip.upcase,
               sms.css('.gc-message-sms-text').text.strip,
@@ -46,7 +45,7 @@ module SocialNotifier
 
         @message_text = @messages.join("\n----\n")
       elsif type == :vm
-        @message_text = "NEW VOICEMAIL: #{@html.css('.gc-edited-trans-text').text.strip}"
+        @message_text = "NEW VOICEMAIL: #{html.css('.gc-edited-trans-text').text.strip}"
       end
 
     end

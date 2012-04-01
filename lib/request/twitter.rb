@@ -29,7 +29,6 @@ module SocialNotifier
         end
       end
 
-      @response        = nil
       @last_tweet_id   = nil
       @notifier_engine = notifier_engine
 
@@ -46,18 +45,19 @@ module SocialNotifier
       validate_parameters
 
       if @method.to_sym    == :list
-        @response = get_list_timeline_tweets @params[0], @params[1]
+        response = get_list_timeline_tweets @params[0], @params[1]
       elsif @method.to_sym == :search
-        @response = get_search_timeline_tweets @params[0]
+        response = get_search_timeline_tweets @params[0]
       elsif @method.to_sym == :home
-        @response = get_home_timeline_tweets
+        response = get_home_timeline_tweets
       else
+        response = nil
         @notifier_engine.log "method: #{@method.inspect}"
       end
 
-      @last_tweet_id = @response.first.id if valid_twitter_response? @response
+      @last_tweet_id = response.first.id if valid_twitter_response? response
 
-      process_response
+      process_response response
 
     end
 
@@ -102,9 +102,9 @@ module SocialNotifier
     # Processes the responses from the API and returns them properly
     # @return [Hash|Exception|Array<Void>]
     #
-    def process_response
-      if @response and @response.is_a? Array
-        @response.map do |entry|
+    def process_response(response)
+      if response and response.is_a? Array
+        response.map do |entry|
 
           begin
             user = entry.user || Twitter.user(entry.from_user)
@@ -124,8 +124,8 @@ module SocialNotifier
           }
 
         end
-      elsif @response and @response.is_a? Exception
-        @response
+      elsif response and response.is_a? Exception
+        response
       else
         []
       end

@@ -42,7 +42,6 @@ module SocialNotifier
         @password = @params.shift if @params.first
       end
 
-      @response        = nil
       @notifier_engine = notifier_engine
 
     end
@@ -55,9 +54,9 @@ module SocialNotifier
     def send
       validate_parameters
 
-      @response = get_rss_contents
+      response = get_rss_contents
 
-      process_response
+      process_response response
     end
 
     def inspect
@@ -88,9 +87,9 @@ module SocialNotifier
 # Processes the responses from the API and returns them properly
 # @return [Hash|Exception|Array<Void>]
 #
-    def process_response
-      if @response and @response.is_a? Array
-        @response.map do |entry|
+    def process_response(response)
+      if response and response.is_a? Array
+        response.map do |entry|
 
           body = []
           body.push entry.title
@@ -107,8 +106,8 @@ module SocialNotifier
           }
 
         end
-      elsif @response and @response.is_a? Exception
-        @response
+      elsif response and response.is_a? Exception
+        response
       else
         []
       end
