@@ -85,7 +85,9 @@ module SocialNotifier
     #
     def process_response
 
-      if @messages.length
+      if @response and @response.is_a? Exception
+        @response
+      elsif @messages.length
 
         response = @messages.map do |entry|
 
@@ -101,9 +103,6 @@ module SocialNotifier
 
         response.compact
 
-
-      elsif @response and @response.is_a? Exception
-        @response
       else
         []
       end
@@ -240,26 +239,30 @@ module SocialNotifier
 
 
     def send
-      @messages = []
-      data = "_rnr_se=#{rnr_se}"
+      begin
+        @messages = []
+        data = "_rnr_se=#{rnr_se}"
 
-      types = {
-        :sms => 'sms',
-        :vm  => 'voicemail',
-        :missed => 'missed',
-      }
+        types = {
+          :sms => 'sms',
+          :vm  => 'voicemail',
+          :missed => 'missed',
+        }
 
-      url = 'https://www.google.com/voice/inbox/recent/'
+        url = 'https://www.google.com/voice/inbox/recent/'
 
-      @response  = send_get(url + types[method], header)
+        @response  = send_get(url + types[method], header)
 
-      document = Nokogiri.XML(@response)
+        document = Nokogiri.XML(@response)
 
-      # MASSIVE hack
-      html_document =  Nokogiri.XML(document.css('response').inner_html.gsub(/<\!\[CDATA\[(.*)\]\]>/m, '\1').gsub(/.*<html>/m, '<html>'))
+        # MASSIVE hack
+        html_document =  Nokogiri.XML(document.css('response').inner_html.gsub(/<\!\[CDATA\[(.*)\]\]>/m, '\1').gsub(/.*<html>/m, '<html>'))
 
-      html_document.css('.gc-message-unread').each do |message|
-        @messages.push SocialNotifier::GoogleVoiceMessageHTML.new(method, message)
+        html_document.css('.gc-message-unread').each do |message|
+          @messages.push SocialNotifier::GoogleVoiceMessageHTML.new(method, message)
+        end
+      rescue => exc
+        @response = exc
       end
 
       process_response

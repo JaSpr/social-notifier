@@ -119,7 +119,7 @@ module SocialNotifier
               response = request.send
 
               if response.is_a? Exception
-                log "API Exception: #{response.class}: #{response.message}"
+                log "#{request.type}: API Exception: #{response.class}: #{response.message}"
               elsif response.is_a? Array and response.first
                 log "Retrieved #{response.length} new #{request.type} update(s)."
                 @statuses = response + @statuses

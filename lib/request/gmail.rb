@@ -90,7 +90,7 @@ module SocialNotifier
         end
 
         # Return the processed response, removing nil entries.
-        final_response.compact!
+        final_response.compact
 
       elsif @response and @response.is_a? Exception
         # return the exception
