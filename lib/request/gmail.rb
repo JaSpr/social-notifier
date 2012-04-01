@@ -102,13 +102,10 @@ module SocialNotifier
     end
 
     def parse_author_tag author
-      author_dup = author.split("\n")
-      author_dup.first[0] = ""
-      author_dup.last[author_dup.last.length - 1] = ""
 
       {
-          :name => author_dup.first,
-          :email => author_dup.last,
+          :name => author.split("\n").first,
+          :email => author.split("\n").last,
       }
 
     end
