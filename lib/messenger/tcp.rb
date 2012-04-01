@@ -42,7 +42,7 @@ module SocialNotifier
         server  = TCPSocket.open('localhost', 3456)
       rescue Exception => e
         @notifier_engine.log "Could not connect to SocialNotifier server process"
-        @notifier_engine.log "#{e.class}: #{e.message}"
+        @notifier_engine.log "Message Sender Exception: #{e.class}: #{e.message}"
       end
 
       # send message
@@ -90,7 +90,7 @@ module SocialNotifier
           @notifier_engine.log 'Finished Message Queue'
 
         rescue Exception => e
-          @notifier_engine.log "#{e.class}: #{e.message}"
+          @notifier_engine.log "Message Listener Exception: #{e.class}: #{e.message}"
         end
       end
 
@@ -111,7 +111,7 @@ module SocialNotifier
       begin
         request_response = @notifier_engine.process_input request_method.to_sym, request
       rescue => exc
-        request_response = "#{exc.class}: #{exc.message}"
+        request_response = "Messenger: Error handling input: #{exc.class}: #{exc.message}"
       end
 
       request_response
