@@ -8,7 +8,11 @@ notification on the desktop whenever a feed finds a new message from
 Gmail, Google Voice, RSS/Atom feeds or Twitter.
 
 One running instance of the daemon can contain multiple and mixed feeds
-from which to retrieve updates.
+from which to retrieve updates.  Each type of request (i.e. Gmail, Gvoice,
+Twitter, Rss) is added to its own stack, and that stack will be scanned
+independently.  One request from the request group will be sent every
+15 seconds. (This means that different types of requests will be scanned
+concurrently)
 
 Future goals are to allow for Facebook feeds as well.
 
@@ -84,10 +88,11 @@ but you can directly query the stack without adding any new requests...
 
 ### DELETING REQUESTS FROM THE STACK:
 
-    ruby application.rb delete [entry number]
+    ruby application.rb delete [entry type:entry index]
+    ruby application.rb delete gmail:1
 
-After deletion, the entry number will not be reused, so running the command
-twice won't delete another entry.
+After deletion, the entry number will not be reassigned, so running
+the command twice won't delete another entry.
 
 
 ### STOPPING THE DAEMON:

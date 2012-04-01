@@ -31,7 +31,7 @@ module SocialNotifier
       if method === :start
         pid = fork do
           Signal.trap('HUP', 'IGNORE')
-          init_master method, params
+          init_master
           sleep
         end
       else
@@ -47,7 +47,7 @@ module SocialNotifier
     # @param params [Array<String>]
     # @return [Void]
     #
-    def init_master(method, params)
+    def init_master
 
       $stdout.reopen(application_log_file, "a")
       $stdout.sync = true
@@ -61,8 +61,8 @@ module SocialNotifier
       log "****************************"
       log ""
 
-      @statuses          = []
-      @requests        = []
+      @statuses        = []
+      @requests        = {}
       @past_status_ids = []
 
       @notifier.send(
@@ -99,40 +99,11 @@ module SocialNotifier
     end
 
     #
-    # Begin the listener threads
+    # Begin the listener thread
     #
     # @return [Void]
     #
     def start
-
-      # Thread to periodically retrieve statuses
-      begin
-        Thread.new do
-          while true
-
-            # loop through requests
-            @requests.each do |request|
-
-              # if request has been deleted, skip with no wait
-              next unless request
-
-              response = request.send
-
-              if response.is_a? Exception
-                log "#{request.type}: API Exception: #{response.class}: #{response.message}"
-              elsif response.is_a? Array and response.first
-                log "Retrieved #{response.length} new #{request.type} update(s)."
-                @statuses = response + @statuses
-              end
-
-              sleep 15
-            end
-            sleep 15
-          end
-        end
-      rescue => exc
-        log exc.message
-      end
 
       # Thread to show statuses
       Thread.new do
@@ -169,6 +140,44 @@ module SocialNotifier
     end
 
     #
+    # Start a new thread to periodically receive a certain type of requests.
+    # @param type [Symbol]
+    # @raise [ArgumentError]
+    # @return [Void]
+    #
+    def start_request_thread(type)
+      raise ArgumentError, "type must be a symbol" unless type.is_a? Symbol
+
+      begin
+        Thread.new do
+          while true
+
+            # loop through requests
+            @requests[type].each do |request|
+
+              # if request has been deleted, skip with no wait
+              next unless request
+
+              response = request.send
+
+              if response.is_a? Exception
+                log "#{request.type}: API Exception: #{response.class}: #{response.message}"
+              elsif response.is_a? Array and response.first
+                log "Retrieved #{response.length} new #{request.type} update(s)."
+                @statuses = response + @statuses
+              end
+
+              sleep 15
+            end
+            sleep 15
+          end
+        end
+      rescue => exc
+        log exc.message
+      end
+    end
+
+    #
     # Return a list of valid request methods
     # @return [Array<Symbol>]
     #
@@ -184,7 +193,7 @@ module SocialNotifier
     # @raise [ArgumentError]
     # @return [String]
     #
-    def process_input method, params
+    def process_input(method, params)
 
       raise ArgumentError, "Invalid notifier method called: '#{method.inspect}'." unless valid_notifier_methods.member? method
 
@@ -196,12 +205,20 @@ module SocialNotifier
               params: params
           }
 
-          @requests.push eval("SocialNotifier::#{request_service.capitalize}Request").new self, request_params
+          unless @requests[request_service.to_sym] and @requests[request_service.to_sym].is_a? Array
+            @requests[request_service.to_sym] = []
+            start_request_thread request_service.to_sym
+          end
+
+          @requests[request_service.to_sym].push eval("SocialNotifier::#{request_service.capitalize}Request").new self, request_params
           #@requests.push SocialNotifier::FacebookRequest.new self, request_params
 
         when :delete
-           if params.first and @requests[params.first.to_i]
-             @requests[params.first.to_i] = nil
+           if params.first
+             request_group, request_index = params.first.split(':')
+             if @requests[request_group.to_sym] and @requests[request_group.to_sym][request_index.to_i]
+               @requests[request_group.to_sym][request_index.to_i] = nil
+             end
            end
 
         when :stop
@@ -218,9 +235,11 @@ module SocialNotifier
       end
 
       response = ""
-      @requests.each_with_index do |value, index|
-        if value
-          response += "[#{index}] #{value.inspect}\n"
+      @requests.each do |type, group|
+        group.each_with_index do |request, index|
+          if request
+            response += "[#{type}:#{index}] #{request.inspect}\n"
+          end
         end
       end
 
