@@ -8,6 +8,8 @@ require_relative 'rss'
 module SocialNotifier
   class GmailRequest < SocialNotifier::RssRequest
 
+    BASE_URL = "https://mail.google.com/mail/feed/atom/"
+
     def type
       "Gmail"
     end
@@ -27,7 +29,7 @@ module SocialNotifier
         end
       end
 
-      @url = "https://mail.google.com/mail/feed/atom/#{@label}"
+      @url = BASE_URL + @label
 
       if @params
         @username = @params.shift if @params.first
@@ -36,6 +38,7 @@ module SocialNotifier
 
       validate_parameters
 
+      @past_entries    = []
       @response        = nil
       @notifier_engine = notifier_engine
 
@@ -60,27 +63,40 @@ module SocialNotifier
     #
     def process_response
       if @response and @response.is_a? Array
-        @response.map do |entry|
+        final_response = @response.map do |entry|
 
-          author = parse_author_tag entry.author
+          # Don't return the same entry on subsequent calls
+          if @past_entries.member? entry.id
+            nil
+          else
+            @past_entries.push entry.id
 
-          body = []
-          body.push author[:email]
-          body.push entry.summary != "" ? entry.summary : "[no message]"
-          body.push entry.modified.to_time
+            author = parse_author_tag entry.author
 
-          {
-            id:        entry.id,
-            title:     "#{author[:name]} | #{entry.title}",
-            body:      body.compact.join("\n---\n"),
-            icon_path: File.realpath("#{Dir.pwd}/assets/gmail.png"),
-            object:    entry
-          }
+            body = []
+            body.push author[:email]
+            body.push entry.summary != "" ? entry.summary : "[no message]"
+            body.push entry.modified.to_time
+
+            {
+                id:        entry.id,
+                title:     "#{author[:name]} | #{entry.title}",
+                body:      body.compact.join("\n---\n"),
+                icon_path: File.realpath("#{Dir.pwd}/assets/gmail.png"),
+                object:    entry
+            }
+          end
 
         end
+
+        # Return the processed response, removing nil entries.
+        final_response.compact!
+
       elsif @response and @response.is_a? Exception
+        # return the exception
         @response
       else
+        # return an empty array
         []
       end
     end
