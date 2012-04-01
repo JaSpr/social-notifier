@@ -27,67 +27,97 @@ module SocialNotifier
     def initialize(notifier_engine, params=nil)
 
       # We use the notifier engine object to write to the log file.
-      #raise ArgumentError, "Notifier engine must be instance of SocialNotifier::Engine" unless notifier_engine.is_a? SocialNotifier::Engine
+      raise ArgumentError, "Notifier engine must be instance of SocialNotifier::Engine" unless notifier_engine.is_a? SocialNotifier::Engine
 
-      # Turn the parameters into instance variables so that we can reference them any time.
-      if params and params.is_a? Enumerable
-        params.each do |key, value|
-          instance_variable_set("@#{key}".to_sym, value)
-          @method = value.to_sym if key == :method
-        end
-      end
+      @params = {}
 
-      if params
-        @username = @params.shift if @params.first
-        @password = @params.shift if @params.first
+      @params[:method] = params[:method].to_sym if params[:method]
+
+      if params[:params] and params[:params].is_a? Array
+        @params[:username] = params[:params].shift if params[:params].first
+        @params[:password] = params[:params].shift if params[:params].first
       end
 
       #validate_parameters
 
+      @messages        = []
       @past_entries    = []
-      @response        = nil
       @notifier_engine = notifier_engine
-      @messages = []
+
+      @notifier_engine.log "#{type}: method = #{method}"
 
     end
 
-    #
+    # send the request
+    def send
+      begin
+        # delete any previous messages
+        @messages = []
+
+        types = {
+            :sms    => 'sms',
+            :vm     => 'voicemail',
+            :missed => 'missed',
+        }
+
+        url  = 'https://www.google.com/voice/inbox/recent/'
+        data = "_rnr_se=#{rnr_se}"
+
+        response  = send_get(url + types[method], header)
+
+        document = parse_response response
+
+        # find DIVs with a class of "gc-message-unread" and convert to messages
+        document.css('.gc-message-unread').each do |message|
+          @messages.push SocialNotifier::GoogleVoiceMessageHTML.new(method, message)
+        end
+      rescue => exc
+        response = exc
+      end
+
+      process_response response
+    end
+
+
     # returns the request method
-    #
     # @return [Symbol]
-    #
     def method
-      @method
+      @params[:method]
     end
 
-    #
     # Directly sets the request method
     #
     # @param method [String, Symbol]
     # @raise [ArgumentError]
     # @return [Symbol]
-    #
     def method=(method)
       raise ArgumentError, "#{method} is not a valid request method" unless valid_methods.member? method.to_sym
-      @method = method.to_sym
+      @params[:method] = method.to_sym
+    end
+
+    def inspect
+      "#{type}: #{method.upcase}: #{@params[:username]}"
     end
 
 ###########################################################################
-    #private
+    private
 ###########################################################################
 
-    #
     # Processes the responses from the API and returns them properly
-    # @return [Hash|Exception|Array<Void>]
-    #
-    def process_response
+    # @return [Array<Hash>|Exception|Array<Void>]
+    def process_response response
 
-      if @response and @response.is_a? Exception
-        @response
+      if response and response.is_a? Exception
+        response
       elsif @messages.length
 
-        response = @messages.map do |entry|
+        final_response = @messages.map do |entry|
 
+          # Don't return the same entry on subsequent calls
+          if @past_entries.member? entry.id
+            nil
+          else
+            @past_entries.push entry.id
             {
               id:        entry.id,
               title:     "#{entry.type.upcase}: #{entry.contact}  (#{entry.time})",
@@ -95,76 +125,45 @@ module SocialNotifier
               icon_path: File.realpath("#{Dir.pwd}/assets/gvoice.png"),
               object:    entry
             }
+          end
 
         end
 
-        response.compact
+        # Remove any invalid entries that were marked as nil
+        final_response.compact
 
       else
         []
       end
     end
 
-    #
     # Throws exception on invalid request.
-    #
     # @raise [ArgumentError]
     # @return [Void]
-    #
     def validate_parameters
 
-      raise ArgumentError, "Request method is not set" unless @method
-      raise ArgumentError, "#{@method} is not a valid request method" unless valid_methods.member? @method.to_sym
+      raise ArgumentError, "Request method is not set" unless method
+      raise ArgumentError, "#{method} is not a valid request method" unless valid_methods.member? method.to_sym
 
-      if @method == 'search'
-        raise ArgumentError, "Search keyword is not set" unless @params.first
-      elsif @method == 'list'
-        raise ArgumentError, "List owner is not set" unless @params.first and @params.first != "" and @params.first != 0
-        raise ArgumentError, "No list selected" unless @params[1] and @params[1] != "" and @params[1] != 0
-      end
+      raise ArgumentError, "Username is not set" unless @params[:username] and @params[:username] != "" and @params[:username].is_a? String
+      raise ArgumentError, "Password is not set" unless @params[:password] and @params[:password] != "" and @params[:password].is_a? String
 
     end
 
-    #
     # list of valid request methods
-    #
     # @return [Array<Symbol>]
-    #
     def valid_methods
       [:sms, :missed, :vm]
     end
 
+
+    # defines a post request
+    # @param uri_str [String]  The URI as a string
+    # @param data [Hash] The data to send as post data
+    # @param header [Hash] The header data
+    # @param limit [Integer] The number of redirects to follow
+    # @return [Net::HTTPResponse]
     #
-    # Retrieve the latest tweets
-    #
-    # @return [Array, Exception]
-    #
-    def get_inbox
-
-      begin
-        response = send
-      rescue => exc
-        return exc
-      end
-
-      response || []
-
-    end
-
-
-    #
-    # @return [String]]
-    def contact_dir
-      @notifier_engine.data_dir + '/google-contacts'
-    end
-
-    #
-    # Initializes the data storage directory
-    # @return [Void]
-    def initialize_data_storage
-      Dir::mkdir contact_dir unless FileTest::directory? contact_dir or not FileTest::directory? @notifier_engine.data_dir
-    end
-
     def send_post(uri_str, data, header = nil, limit = 3)
       raise ArgumentError, 'HTTP redirect too deep' if limit == 0
       url = URI.parse(uri_str)
@@ -181,6 +180,13 @@ module SocialNotifier
       end
     end
 
+    # defines a get request
+    # @param uri_str [String]  The URI as a string
+    # @param header [Hash] The header data
+    # @param limit [Integer] The number of redirects to follow
+    # @raise [Exception]
+    # @return [Net::HTTPResponse]
+    #
     def send_get(uri_str, header, limit = 3)
       raise ArgumentError, 'HTTP redirect too deep' if limit == 0
       url = URI.parse(uri_str)
@@ -196,10 +202,13 @@ module SocialNotifier
       end
     end
 
+    # Retrieves the auth code
+    # @raise [Exception]
+    # @return [String]
     def auth_code
       unless @auth_code
-        data = "accountType=GOOGLE&Email=#{@username}&Passwd=#{@password}&service=grandcentral&source=jaspr-socialnotifierCLI-1.0"
-        res = send_post('https://www.google.com/accounts/ClientLogin', data)
+        data = "accountType=GOOGLE&Email=#{@params[:username]}&Passwd=#{@params[:password]}&service=grandcentral&source=jaspr-socialnotifierCLI-1.0"
+        res  = send_post('https://www.google.com/accounts/ClientLogin', data)
         if res
           @auth_code = res.match(/Auth=(.+)/)[1]
         else
@@ -211,17 +220,24 @@ module SocialNotifier
 
     end
 
+    # Build the http header with the auth_code previously retrieved
+    # @return [Net::HTTPResponse]
     def header
       {'Authorization ' => "GoogleLogin auth=#{auth_code.strip}",'Content-Length' => '0'}
     end
 
+    # retrieve a new response, based on the header data,
+    # which includes the auth content from the previous response
+    # @return Http
     def new_res
       unless @new_res
-        @new_res = send_get('https://www.google.com/voice',header)
+        @new_res = send_get('https://www.google.com/voice', header)
       end
       @new_res
     end
 
+    # Retrieve the _rnr_se value from the new response
+    # @return [String]
     def rnr_se
       unless @rnr_se
         if new_res
@@ -234,35 +250,21 @@ module SocialNotifier
       @rnr_se
     end
 
+    # filter out invalid html content
+    # @return []
+    def parse_response response
+      # parse response as XML
+      document = Nokogiri.XML(response)
 
-    def send
-      begin
-        @messages = []
-        data = "_rnr_se=#{rnr_se}"
+      # Hacky
+      # clear out CDATA tags, leaving their inner content, because otherwise nokogiri can't handle it
+      document = document.css('response').inner_html.gsub(/<\!\[CDATA\[(.*)\]\]>/m, '\1')
 
-        types = {
-          :sms => 'sms',
-          :vm  => 'voicemail',
-          :missed => 'missed',
-        }
+      #remove <json></json> content, because nokogiri will report it as the only element
+      document = document.gsub(/.*<html>/m, '<html>')
 
-        url = 'https://www.google.com/voice/inbox/recent/'
-
-        @response  = send_get(url + types[method], header)
-
-        document = Nokogiri.XML(@response)
-
-        # MASSIVE hack
-        html_document =  Nokogiri.XML(document.css('response').inner_html.gsub(/<\!\[CDATA\[(.*)\]\]>/m, '\1').gsub(/.*<html>/m, '<html>'))
-
-        html_document.css('.gc-message-unread').each do |message|
-          @messages.push SocialNotifier::GoogleVoiceMessageHTML.new(method, message)
-        end
-      rescue => exc
-        @response = exc
-      end
-
-      process_response
+      # re-parse resulting html
+      document =  Nokogiri.XML(document)
     end
 
   end
