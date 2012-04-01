@@ -4,13 +4,13 @@
 
 This application was written and tested for ruby1.9.2 and is designed to
 work in conjunction with the libnotify notification daemon to display a
-notification on the desktop whenever a new tweet is listed in your twitter
-timeline.
+notification on the desktop whenever a feed finds a new message from
+Gmail, Google Voice, RSS/Atom feeds or Twitter.
 
 One running instance of the daemon can contain multiple and mixed feeds
 from which to retrieve updates.
 
-Future goals are to allow for rss/atom feeds and Facebook feeds as well.
+Future goals are to allow for Facebook feeds as well.
 
 
 #####################
@@ -20,8 +20,10 @@ Future goals are to allow for rss/atom feeds and Facebook feeds as well.
 To use this application in its present state, you must have the following
 gems installed: (use commands below).
 
-    sudo gem install libnotifier
-    sudo gem install twitter
+    sudo gem install libnotifier    # For using libnotify
+    sudo gem install nokogiri       # For using Google Voice
+    sudo gem install simple-rss     # For using Gmail, RSS/Atom
+    sudo gem install twitter        # For using Twitter
 
 *** Following facebook feeds isn't working right now, as the offline_access
 *** token is being deprecated.
@@ -56,19 +58,19 @@ Twitter:
 Gmail (view unread within any label):
 
     ruby application.rb add gmail [label or 'inbox'] [username] [password]
-    ruby application.rb add gmail inbox [username] [password]
-    ruby application.rb add gmail work [username] [password]
+    ruby application.rb add gmail inbox [username/email] [password]
+    ruby application.rb add gmail work  [username/email] [password]
 
 Google Voice: (unread texts, voicemails, or missed calls)
 
-    ruby application.rb add gvoice sms [username] [password]
-    ruby application.rb add gvoice vm [username] [password]
-    ruby application.rb add gvoice missed [username] [password]
+    ruby application.rb add gvoice sms    [username/email] [password]
+    ruby application.rb add gvoice vm     [username/email] [password]
+    ruby application.rb add gvoice missed [username/email] [password]
 
 RSS / ATOM
 
     ruby application.rb add rss http://path.com/url/to/rss/feed
-    ruby application.rb add rss http://path.com/url/to/rss/feed [username] [password]
+    ruby application.rb add rss http://path.com/url/to/rss/feed [username] [password]  # (optional un/pass)
 
 
 Those command all return a numbered list of requests in your stack,

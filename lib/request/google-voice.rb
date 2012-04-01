@@ -1,14 +1,11 @@
 #! /usr/bin/ruby -wW2d
 
-require 'cgi'
-require 'json'
 require 'nokogiri'
 require 'net/http'
 require 'net/https'
 require 'open-uri'
 
 require_relative '../request'
-require_relative 'google-voice/message'
 require_relative 'google-voice/message-html'
 
 module SocialNotifier
