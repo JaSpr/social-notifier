@@ -102,7 +102,7 @@ module SocialNotifier
     end
 
     def parse_author_tag author
-      author_dup = author.dump.split('\\')
+      author_dup = author.split("\n")
       author_dup.first[0] = ""
       author_dup.last[author_dup.last.length - 1] = ""
 
