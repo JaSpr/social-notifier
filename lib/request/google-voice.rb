@@ -9,6 +9,7 @@ require 'open-uri'
 
 require_relative '../request'
 require_relative 'google-voice/message'
+require_relative 'google-voice/message-html'
 
 module SocialNotifier
   class GvoiceRequest < SocialNotifier::Request
@@ -35,7 +36,7 @@ module SocialNotifier
       if params and params.is_a? Enumerable
         params.each do |key, value|
           instance_variable_set("@#{key}".to_sym, value)
-          @label = value if key == :method
+          @method = value.to_sym if key == :method
         end
       end
 
@@ -84,22 +85,17 @@ module SocialNotifier
     #
     def process_response
 
-      if @response
+      if @messages.length
 
         response = @messages.map do |entry|
 
-          if entry.isRead or entry.type == 11
-            nil
-          else
-            puts entry.inspect
             {
               id:        entry.id,
-              title:     entry.displayNumber,
-              body:      "#{entry.messageText}\n#{entry.relativeStartTime} at #{entry.displayStartTime}",
+              title:     "#{entry.type.upcase}: #{entry.contact}  (#{entry.time})",
+              body:      entry.message_text,
               icon_path: File.realpath("#{Dir.pwd}/assets/gvoice.png"),
               object:    entry
             }
-          end
 
         end
 
@@ -139,7 +135,7 @@ module SocialNotifier
     # @return [Array<Symbol>]
     #
     def valid_methods
-      [:sms, :inbox, :missed]
+      [:sms, :missed, :vm]
     end
 
     #
@@ -246,13 +242,24 @@ module SocialNotifier
     def send
       @messages = []
       data = "_rnr_se=#{rnr_se}"
-      @response  = send_get('https://www.google.com/voice/inbox/recent/sms/', header)
+
+      types = {
+        :sms => 'sms',
+        :vm  => 'voicemail',
+        :missed => 'missed',
+      }
+
+      url = 'https://www.google.com/voice/inbox/recent/'
+
+      @response  = send_get(url + types[method], header)
 
       document = Nokogiri.XML(@response)
-      response_data = JSON.parse(document.css('response > html').text)
 
-      response_data['messages'].each do |message|
-        @messages.push SocialNotifier::GoogleVoiceMessage.new(self, message)
+      # MASSIVE hack
+      html_document =  Nokogiri.XML(document.css('response').inner_html.gsub(/<\!\[CDATA\[(.*)\]\]>/m, '\1').gsub(/.*<html>/m, '<html>'))
+
+      html_document.css('.gc-message-unread').each do |message|
+        @messages.push SocialNotifier::GoogleVoiceMessageHTML.new(method, message)
       end
 
       process_response

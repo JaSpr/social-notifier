@@ -46,10 +46,30 @@ gems installed: (use commands below).
 
 ### ADDING REQUESTS TO THE STACK:
 
+Twitter:
+
     ruby application.rb add twitter home
     ruby application.rb add twitter list [list-owner] [list]
     ruby application.rb add twitter search keyword
     ruby application.rb add twitter search "key words"
+
+Gmail (view unread within any label):
+
+    ruby application.rb add gmail [label or 'inbox'] [username] [password]
+    ruby application.rb add gmail inbox [username] [password]
+    ruby application.rb add gmail work [username] [password]
+
+Google Voice: (unread texts, voicemails, or missed calls)
+
+    ruby application.rb add gvoice sms [username] [password]
+    ruby application.rb add gvoice vm [username] [password]
+    ruby application.rb add gvoice missed [username] [password]
+
+RSS / ATOM
+
+    ruby application.rb add rss http://path.com/url/to/rss/feed
+    ruby application.rb add rss http://path.com/url/to/rss/feed [username] [password]
+
 
 Those command all return a numbered list of requests in your stack,
 but you can directly query the stack without adding any new requests...
