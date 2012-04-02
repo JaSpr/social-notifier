@@ -78,7 +78,7 @@ module SocialNotifier
 
 
     def inspect
-      "#{type}: #{@param[:url]}"
+      "#{type}: #{@params[:url]}"
     end
 
 ###########################################################################
@@ -97,7 +97,7 @@ module SocialNotifier
 
           body = []
           entry.css('path').each do |path|
-            body.push "(#{path.attr('action')}): #{path.text}"
+            body.push "#{path.attr('action')}  #{path.text.gsub(/^\//, '')}"
           end
 
           body = [body.join("\n")]

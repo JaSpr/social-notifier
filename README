@@ -4,12 +4,19 @@
 
 This application was written and tested for ruby1.9.2 and is designed to
 work in conjunction with the libnotify notification daemon to display a
-notification on the desktop whenever a feed finds a new message from
-Gmail, Google Voice, RSS/Atom feeds, Subversion logs, or Twitter.
+notification on the desktop whenever a feed finds a new message from any
+of the following services:
+
+ * Twitter          (Home feed, list, or search)
+ * Gmail            (Inbox or any other label)
+ * Google Voice     (SMS, Missed Calls, or Voicemails)
+ * RSS / Atom Feeds
+ * Github           (Commit messages and affected files)
+ * SVN              (Commit messages and affected files)
 
 One running instance of the daemon can contain multiple and mixed feeds
 from which to retrieve updates.  Each type of request (i.e. Gmail, Gvoice,
-Twitter, Rss) is added to its own stack, and that stack will be scanned
+Twitter, etc.) is added to its own stack, and that stack will be scanned
 independently.  One request from the request group will be sent every
 15 seconds. (This means that different types of requests will be scanned
 concurrently)
@@ -24,17 +31,12 @@ Future goals are to allow for Facebook feeds as well.
 To use this application in its present state, you must have the following
 gems installed: (use commands below).
 
-    sudo gem install libnotifier    # For using libnotify
-    sudo gem install nokogiri       # For using Google Voice or SVN
-    sudo gem install simple-rss     # For using Gmail, RSS/Atom
-    sudo gem install twitter        # For using Twitter
+    sudo gem install libnotifier     # For using libnotify
+    sudo gem install nokogiri        # For using Google Voice, SVN, GitHub
+    sudo gem install simple-rss      # For using Gmail, RSS/Atom
+    sudo gem install twitter         # For using Twitter
+    sudo apt-get install subversion  # For using SVN (requires the command line client)
 
-
-*** The subversion component uses the svn command line client. This must
-*** be installed and accessible directly (in the $PATH variable)
-
-    # LINUX:
-    sudo apt-get install subversion
 
 *** Following facebook feeds isn't working right now, as the offline_access
 *** token is being deprecated.
@@ -89,6 +91,10 @@ Subversion
     ruby application.rb add subversion http://path.com/url/to/repo
     ruby application.rb add svn https://path.com/url/to/repo [username] [password]
 
+GitHub
+
+    ruby application.rb add github [github commits atom URL]
+    ruby application.rb add github https://github.com/JaSpr/social-notifier/commits/master.atom
 
 Those command all return a numbered list of requests in your stack,
 but you can directly query the stack without adding any new requests...
