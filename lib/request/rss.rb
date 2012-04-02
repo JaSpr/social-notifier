@@ -42,6 +42,7 @@ module SocialNotifier
         @password = @params.shift if @params.first
       end
 
+      @past_entries    = []
       @notifier_engine = notifier_engine
 
     end

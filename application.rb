@@ -12,6 +12,8 @@ require_relative 'lib/request/facebook'
 require_relative 'lib/request/gmail'
 require_relative 'lib/request/google-voice'
 require_relative 'lib/request/svn'
+require_relative 'lib/request/github'
+
 
 # require the messenger class you'd like to use
 require_relative 'lib/messenger/tcp'
