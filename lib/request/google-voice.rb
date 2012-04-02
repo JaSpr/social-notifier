@@ -44,8 +44,6 @@ module SocialNotifier
       @past_entries    = []
       @notifier_engine = notifier_engine
 
-      @notifier_engine.log "#{type}: method = #{method}"
-
     end
 
     # send the request
