@@ -8,8 +8,6 @@ require_relative 'base'
 module SocialNotifier
   class SubversionRequest < SocialNotifier::Request
 
-    attr_accessor :keyword, :list_owner, :list_slug, :doc
-
     def type
       "SVN"
     end
@@ -160,9 +158,9 @@ module SocialNotifier
         @notifier_engine.log line.strip
       end
 
-      @doc = Nokogiri::XML(stdout.read)
+      doc = Nokogiri::XML(stdout.read)
 
-      @doc.css("logentry")
+      doc.css("logentry")
 
     end
 
