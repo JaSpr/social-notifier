@@ -1,6 +1,6 @@
 require 'socket'
 
-require_relative '../messenger'
+require_relative 'base'
 
 module SocialNotifier
   class Messenger

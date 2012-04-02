@@ -4,7 +4,7 @@ require 'simple-rss'
 require 'net/http'
 require 'open-uri'
 
-require_relative '../request'
+require_relative 'base'
 
 module SocialNotifier
   class RssRequest < SocialNotifier::Request

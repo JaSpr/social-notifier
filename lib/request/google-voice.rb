@@ -5,7 +5,7 @@ require 'net/http'
 require 'net/https'
 require 'open-uri'
 
-require_relative '../request'
+require_relative 'base'
 require_relative 'google-voice/message-html'
 
 module SocialNotifier

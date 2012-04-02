@@ -1,6 +1,6 @@
 #! /usr/bin/ruby -wW2d
 
-require_relative '../request'
+require_relative 'base'
 
 module SocialNotifier
   class FacebookRequest < SocialNotifier::Request
