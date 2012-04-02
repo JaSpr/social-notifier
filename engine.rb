@@ -5,7 +5,6 @@ require 'net/http'
 module SocialNotifier
   class Engine
 
-    #
     # Initialize
     #
     # @return [Void]
@@ -52,8 +51,8 @@ module SocialNotifier
       $stdout.reopen(application_log_file, "a")
       $stdout.sync = true
 
-      @messenger = SocialNotifier::Messenger.new self, true
-      @notifier  = SocialNotifier::Notifier.new
+      @messenger = load_messenger true
+      @notifier  = load_notifier
 
       log ""
       log "****************************"
@@ -79,6 +78,40 @@ module SocialNotifier
 
     end
 
+
+    # Dynamically loads the messenger object
+    #
+    # @param whether or not this is the messaging server
+    # @raise [ArgumentError]
+    # @return [SocialNotifier::Messenger::[Mixed]]
+    #
+    def load_messenger(is_master=false)
+      messenger_service = $app_config[:messenger_class].downcase
+      file_path = "#{Dir.pwd}/lib/messenger/#{messenger_service}.rb"
+
+      raise ArgumentError, "Invalid messenger type #{messenger_service}" unless File.file? file_path
+      require(File.realpath(file_path))
+
+      class_name = messenger_service.split(/[^\w]/).map { |word| word.capitalize }.join
+      SocialNotifier::Messenger.const_get(class_name).new self, is_master
+    end
+
+    # Dynamically loads the notifier object
+    #
+    # @raise [ArgumentError]
+    # @return [SocialNotifier::Messenger::[Mixed]]
+    #
+    def load_notifier
+      notifier_service = $app_config[:notifier_class].downcase
+      file_path = "#{Dir.pwd}/lib/notifier/#{notifier_service}.rb"
+
+      raise ArgumentError, "Invalid notifier type #{notifier_service}" unless File.file? file_path
+      require(File.realpath(file_path))
+
+      class_name = notifier_service.split(/[^\w]/).map { |word| word.capitalize }.join
+      SocialNotifier::Notifier.const_get(class_name).new
+    end
+
     #
     # Initialization for subsidiary processes
     #
@@ -88,7 +121,7 @@ module SocialNotifier
     #
     def init_child(method, params)
 
-      @messenger = SocialNotifier::Messenger.new self, false
+      @messenger = load_messenger
 
       params.unshift method
 
@@ -199,7 +232,7 @@ module SocialNotifier
 
       case method
         when :add
-          request_service = params.shift
+          request_service = params.shift.downcase
           request_params = {
               method: params.shift,
               params: params
@@ -210,8 +243,17 @@ module SocialNotifier
             start_request_thread request_service.to_sym
           end
 
-          @requests[request_service.to_sym].push eval("SocialNotifier::#{request_service.capitalize}Request").new self, request_params
-          #@requests.push SocialNotifier::FacebookRequest.new self, request_params
+          file_path = "#{Dir.pwd}/lib/request/#{request_service}.rb"
+
+          raise ArgumentError, "Invalid request type #{request_service}" unless File.file? file_path
+
+          require(File.realpath(file_path))
+
+          class_name = request_service.split(/[^\w]/).map { |word| word.capitalize }.join
+
+          request = SocialNotifier::Request.const_get(class_name).new self, request_params
+
+          @requests[request_service.to_sym].push request
 
         when :delete
            if params.first

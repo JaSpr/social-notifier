@@ -17,14 +17,14 @@ of the following services:
 Since it is presently using libnotify, it is designed to work in Linux,
 Although I have heard of windows ports for libnotify, and additional
 notifier classes could also be written for windows or mac notification
-libraries
+libraries.
 
 One running instance of the daemon can contain multiple and mixed feeds
 from which to retrieve updates.  Each type of request (i.e. Gmail, Gvoice,
 Twitter, etc.) is added to its own stack, and that stack will be scanned
 independently.  One request from the request group will be sent every
 15 seconds. (This means that different types of requests will be scanned
-concurrently)
+concurrently).
 
 Future goals are to allow for Facebook feeds as well.
 
@@ -81,9 +81,9 @@ Gmail (view unread within any label):
 
 Google Voice: (unread texts, voicemails, or missed calls)
 
-    ruby application.rb add gvoice sms    [username/email] [password]
-    ruby application.rb add gvoice vm     [username/email] [password]
-    ruby application.rb add gvoice missed [username/email] [password]
+    ruby application.rb add google-voice sms    [username/email] [password]
+    ruby application.rb add google-voice vm     [username/email] [password]
+    ruby application.rb add google-voice missed [username/email] [password]
 
 RSS / ATOM
 
