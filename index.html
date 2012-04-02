@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Social-notifier : Ruby application that makes use of linux's libnotify to pop-up notifications when new tweets are retrieved from the Twitter API." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Social-notifier</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/JaSpr/social-notifier">Fork Me on GitHub</a>
+
+          <h1 id="project_title">Social-notifier</h1>
+          <h2 id="project_tagline">Ruby application that makes use of linux's libnotify to pop-up notifications when new tweets are retrieved from the Twitter API.</h2>
+
+          <section id="downloads">
+            <a class="zip_download_link" href="https://github.com/JaSpr/social-notifier/zipball/master">Download this project as a .zip file</a>
+            <a class="tar_download_link" href="https://github.com/JaSpr/social-notifier/tarball/master">Download this project as a tar.gz file</a>
+          </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>About</h2>
+
+<p>This application was written and tested for ruby1.9.2 and is designed to
+work in conjunction with the libnotify notification daemon to display a
+notification on the desktop whenever a feed finds a new message from any
+of the following services:</p>
+
+<ul>
+<li>Twitter          (Home feed, list, or search)</li>
+<li>Gmail            (Inbox or any other label)</li>
+<li>Google Voice     (SMS, Missed Calls, or Voicemails)</li>
+<li>RSS / Atom Feeds</li>
+<li>Github           (Commit messages and affected files)</li>
+<li>SVN              (Commit messages and affected files)</li>
+</ul><p>Since it is presently using libnotify, it is designed to work in Linux,
+Although I have heard of windows ports for libnotify, and additional
+notifier classes could also be written for windows or mac notification
+libraries</p>
+
+<p>One running instance of the daemon can contain multiple and mixed feeds
+from which to retrieve updates.  Each type of request (i.e. Gmail, Gvoice,
+Twitter, etc.) is added to its own stack, and that stack will be scanned
+independently.  One request from the request group will be sent every
+15 seconds. (This means that different types of requests will be scanned
+concurrently)</p>
+
+<p>Future goals are to allow for Facebook feeds as well.</p>
+
+<h2>Prerequisites</h2>
+
+<p>To use this application in its present state, you must have the following
+gems installed: (use commands below).</p>
+
+<pre><code>sudo gem install libnotifier     # For using libnotify
+sudo gem install nokogiri        # For using Google Voice, SVN, GitHub
+sudo gem install simple-rss      # For using Gmail, RSS/Atom
+sudo gem install twitter         # For using Twitter
+sudo apt-get install subversion  # For using SVN (requires the command line client)
+</code></pre>
+
+<p>*** Following facebook feeds isn't working right now, as the offline_access
+*** token is being deprecated.</p>
+
+<pre><code>sudo gem install fb_graph
+</code></pre>
+
+<p><strong>config-dist.rb must be filled out and renamed as config.rb for the</strong>
+<strong>application to run, and you must fill out your twitter settings in</strong>
+<strong>that file (follow the instructions in that file) to access the</strong>
+<strong>Twitter API</strong></p>
+
+<h2>Instructions</h2>
+
+<h3>Starting the daemon:</h3>
+
+<pre><code>ruby application.rb start
+</code></pre>
+
+<h3>Adding requests to the stack:</h3>
+
+<p>Twitter:</p>
+
+<pre><code>ruby application.rb add twitter home
+ruby application.rb add twitter list [list-owner] [list]
+ruby application.rb add twitter search keyword
+ruby application.rb add twitter search "key words"
+</code></pre>
+
+<p>Gmail (view unread within any label):</p>
+
+<pre><code>ruby application.rb add gmail [label or 'inbox'] [username] [password]
+ruby application.rb add gmail inbox [username/email] [password]
+ruby application.rb add gmail work  [username/email] [password]
+</code></pre>
+
+<p>Google Voice: (unread texts, voicemails, or missed calls)</p>
+
+<pre><code>ruby application.rb add gvoice sms    [username/email] [password]
+ruby application.rb add gvoice vm     [username/email] [password]
+ruby application.rb add gvoice missed [username/email] [password]
+</code></pre>
+
+<p>RSS / ATOM</p>
+
+<pre><code>ruby application.rb add rss <a href="http://path.com/url/to/rss/feed">http://path.com/url/to/rss/feed</a>
+ruby application.rb add rss <a href="http://path.com/url/to/rss/feed">http://path.com/url/to/rss/feed</a> [username] [password]  # (optional un/pass)
+</code></pre>
+
+<p>Subversion</p>
+
+<pre><code>ruby application.rb add subversion http[s]://path.com/url/to/repo [username] [password]
+ruby application.rb add subversion http[s]://path.com/url/to/repo
+</code></pre>
+
+<p>GitHub</p>
+
+<pre><code>ruby application.rb add github [github commits atom URL]
+ruby application.rb add github <a href="https://github.com/JaSpr/social-notifier/commits/master.atom">https://github.com/JaSpr/social-notifier/commits/master.atom</a>
+</code></pre>
+
+<p>These commands all return a numbered list of requests in your stack,
+but you can directly query the stack without adding any new requests...</p>
+
+<h3>Listing requests in the stack:</h3>
+
+<pre><code>ruby application.rb list
+</code></pre>
+
+<h3>Deleting requests from the stack:</h3>
+
+<pre><code>ruby application.rb delete [entry type:entry index]
+ruby application.rb delete gmail:1
+</code></pre>
+
+<p>After deletion, the entry number will not be reassigned, so running
+the command twice won't delete another entry.</p>
+
+<h3>Stopping the daemon:</h3>
+
+<pre><code>ruby application.rb stop
+</code></pre>
+
+<h2>Debugging</h2>
+
+<p>A storage directory is created in your home directory in a directory named
+.social-notifier .  This directory contains a subdirectory 'log' which
+contains the application log ( everything purposefully logged to the output )
+and the debug log, which is lists ruby debug messages.</p>
+
+<pre><code>tail -f ~/.social-notifier/log/*
+</code></pre>
+
+<p>Additionally, a twitter-images folder is created to store Twitter user images
+so that they can be displayed with the tweet notification.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Social-notifier maintained by <a href="https://github.com/JaSpr">JaSpr</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
