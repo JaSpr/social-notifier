@@ -14,6 +14,11 @@ of the following services:
  * Github           (Commit messages and affected files)
  * SVN              (Commit messages and affected files)
 
+Since it is presently using libnotify, it is designed to work in Linux,
+Although I have heard of windows ports for libnotify, and additional
+notifier classes could also be written for windows or mac notification
+libraries
+
 One running instance of the daemon can contain multiple and mixed feeds
 from which to retrieve updates.  Each type of request (i.e. Gmail, Gvoice,
 Twitter, etc.) is added to its own stack, and that stack will be scanned
