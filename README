@@ -96,7 +96,7 @@ GitHub
     ruby application.rb add github [github commits atom URL]
     ruby application.rb add github https://github.com/JaSpr/social-notifier/commits/master.atom
 
-Those command all return a numbered list of requests in your stack,
+These commands all return a numbered list of requests in your stack,
 but you can directly query the stack without adding any new requests...
 
 
