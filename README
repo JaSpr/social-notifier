@@ -5,7 +5,7 @@
 This application was written and tested for ruby1.9.2 and is designed to
 work in conjunction with the libnotify notification daemon to display a
 notification on the desktop whenever a feed finds a new message from
-Gmail, Google Voice, RSS/Atom feeds or Twitter.
+Gmail, Google Voice, RSS/Atom feeds, Subversion logs, or Twitter.
 
 One running instance of the daemon can contain multiple and mixed feeds
 from which to retrieve updates.  Each type of request (i.e. Gmail, Gvoice,
@@ -25,9 +25,16 @@ To use this application in its present state, you must have the following
 gems installed: (use commands below).
 
     sudo gem install libnotifier    # For using libnotify
-    sudo gem install nokogiri       # For using Google Voice
+    sudo gem install nokogiri       # For using Google Voice or SVN
     sudo gem install simple-rss     # For using Gmail, RSS/Atom
     sudo gem install twitter        # For using Twitter
+
+
+*** The subversion component uses the svn command line client. This must
+*** be installed and accessible directly (in the $PATH variable)
+
+    # LINUX:
+    sudo apt-get install subversion
 
 *** Following facebook feeds isn't working right now, as the offline_access
 *** token is being deprecated.
@@ -75,6 +82,13 @@ RSS / ATOM
 
     ruby application.rb add rss http://path.com/url/to/rss/feed
     ruby application.rb add rss http://path.com/url/to/rss/feed [username] [password]  # (optional un/pass)
+
+Subversion
+
+    ruby application.rb add [svn or subversion] http(s)://path.com/url/to/repo [username] [password]
+    ruby application.rb add subversion http://path.com/url/to/repo
+    ruby application.rb add svn https://path.com/url/to/repo [username] [password]
+
 
 
 Those command all return a numbered list of requests in your stack,
