@@ -295,11 +295,15 @@ module SocialNotifier
     # @return [Void]
     #
     def log(message)
-      log_message = "[#{Time.parse(Time.now.to_s)}]: " + message + "\n"
+      lines = message.split("\n").compact
 
-      puts log_message if @debug
+      lines.each do |line|
+        log_message = "[#{Time.parse(Time.now.to_s)}]: " + line  + "\n"
 
-      File.open(application_log_file, 'a') {|f| f.write(log_message)}
+        puts log_message if @debug
+
+        File.open(application_log_file, 'a') {|f| f.write(log_message)}
+      end
     end
 
     #
