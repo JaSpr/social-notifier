@@ -36,10 +36,16 @@ Future goals are to allow for Facebook feeds as well.
 To use this application in its present state, you must have the following
 gems installed: (use commands below).
 
-    sudo gem install libnotifier     # For using libnotify
-    sudo gem install nokogiri        # For using Google Voice, SVN, GitHub
+    sudo apt-get install ruby1.9.1-dev            # To allow installing gems which require mkmf
+
+    sudo gem install libnotify                    # For using libnotify
+
+    sudo apt-get install libxml2-dev libxslt1-dev # For nokogiri
+    sudo gem install nokogiri                     # For using Google Voice, SVN, GitHub
+
     sudo gem install simple-rss      # For using Gmail, RSS/Atom
     sudo gem install twitter         # For using Twitter
+
     sudo apt-get install subversion  # For using SVN (requires the command line client)
 
 
