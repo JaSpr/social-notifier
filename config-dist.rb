@@ -1,6 +1,6 @@
 $app_config = {
-    messenger_class: 'Tcp',
-    notifier_class : 'Libnotify',
+    :messenger_class => 'Tcp',
+    :notifier_class  => 'Libnotify',
 }
 #
 # Configuration settings for Twitter API
