@@ -49,7 +49,7 @@ module SocialNotifier
 
       # send the request
       def send
-        #begin
+        begin
           # delete any previous messages
           @messages = []
 
@@ -70,9 +70,9 @@ module SocialNotifier
           document.css('.gc-message-unread').each do |message|
             @messages.push SocialNotifier::Request::Message::GoogleVoice.new(method, message)
           end
-        #rescue => exc
-        #  response = exc
-        #end
+        rescue => exc
+          response = exc
+        end
 
         process_response response
       end
