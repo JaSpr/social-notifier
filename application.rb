@@ -2,9 +2,9 @@
 
 require 'etc'
 
-# set the application path and user_path
+# set the application path and data path
 APPLICATION_PATH = File.dirname File.expand_path __FILE__
-USER_PATH        = Etc.getpwuid.dir + "/.social-notifier"
+DATA_PATH        = Etc.getpwuid.dir + "/.social-notifier"
 
 require_relative 'engine'
 require_relative 'config'

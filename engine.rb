@@ -313,7 +313,7 @@ module SocialNotifier
     # @raise [ArgumentError]
     #
     def response_file
-      data_dir + "/responses"
+      DATA_PATH + "/responses"
     end
 
     #
@@ -323,17 +323,10 @@ module SocialNotifier
     # @raise [ArgumentError]
     #
     def request_file
-      data_dir + "/requests"
+      DATA_PATH + "/requests"
     end
 
-    #
-    # Returns the data directory
-    # @return [String]
-    #
-    def data_dir
-      raise ArgumentError, "Data directory is not set" unless @data_dir
-      @data_dir
-    end
+
 
     private
 
@@ -343,10 +336,8 @@ module SocialNotifier
     # @return [Void]
     #
     def init_data_storage
-      @data_dir = Etc.getpwuid.dir + "/.social-notifier"
-
-      Dir::mkdir @data_dir unless FileTest::directory? @data_dir
-      Dir::mkdir log_dir   unless FileTest::directory? log_dir or not FileTest::directory? @data_dir
+      Dir::mkdir DATA_PATH unless FileTest::directory? DATA_PATH
+      Dir::mkdir log_dir   unless FileTest::directory? log_dir or not FileTest::directory? DATA_PATH
     end
 
 
@@ -357,7 +348,7 @@ module SocialNotifier
     # @raise [ArgumentError]
     #
     def log_dir
-      data_dir + "/log"
+      DATA_PATH + "/log"
     end
 
     #

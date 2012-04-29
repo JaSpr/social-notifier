@@ -185,11 +185,11 @@ module SocialNotifier
 
 
       def icon_dir
-        @notifier_engine.data_dir + '/facebook-images'
+        DATA_PATH + '/facebook-images'
       end
 
       def initialize_data_storage
-        Dir::mkdir icon_dir unless FileTest::directory? icon_dir or not FileTest::directory? @notifier_engine.data_dir
+        Dir::mkdir icon_dir unless FileTest::directory? icon_dir or not FileTest::directory? DATA_PATH
       end
 
       #

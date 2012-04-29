@@ -229,14 +229,14 @@ module SocialNotifier
       #
       # @return [String]]
       def icon_dir
-        @notifier_engine.data_dir + '/twitter-images'
+        DATA_PATH + '/twitter-images'
       end
 
       #
       # Initializes the data storage directory
       # @return [Void]
       def initialize_data_storage
-        Dir::mkdir icon_dir unless FileTest::directory? icon_dir or not FileTest::directory? @notifier_engine.data_dir
+        Dir::mkdir icon_dir unless FileTest::directory? icon_dir or not FileTest::directory? DATA_PATH
       end
 
     end
