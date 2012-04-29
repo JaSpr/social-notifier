@@ -36,6 +36,8 @@ Future goals are to allow for Facebook feeds as well.
 To use this application in its present state, you must have the following
 gems installed: (use commands below).
 
+    sudo gem install uuid
+
     sudo apt-get install ruby1.9.1-dev            # To allow installing gems which require mkmf
 
     sudo gem install libnotify                    # For using libnotify
