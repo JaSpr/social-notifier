@@ -74,38 +74,38 @@ gems installed: (use commands below).
 
 Twitter:
 
-    ruby application.rb add twitter home
-    ruby application.rb add twitter list [list-owner] [list]
-    ruby application.rb add twitter search keyword
-    ruby application.rb add twitter search "key words"
+    ./application.rb add twitter home
+    ./application.rb add twitter list [list-owner] [list]
+    ./application.rb add twitter search keyword
+    ./application.rb add twitter search "key words"
 
 Gmail (view unread within any label):
 
-    ruby application.rb add gmail [label or 'inbox'] [username] [password]
-    ruby application.rb add gmail inbox [username/email] [password]
-    ruby application.rb add gmail work  [username/email] [password]
+    ./application.rb add gmail [label or 'inbox'] [username] [password]
+    ./application.rb add gmail inbox [username/email] [password]
+    ./application.rb add gmail work  [username/email] [password]
 
 Google Voice: (unread texts, voicemails, or missed calls)
 
-    ruby application.rb add google-voice sms    [username/email] [password]
-    ruby application.rb add google-voice vm     [username/email] [password]
-    ruby application.rb add google-voice missed [username/email] [password]
+    ./application.rb add google-voice sms    [username/email] [password]
+    ./application.rb add google-voice vm     [username/email] [password]
+    ./application.rb add google-voice missed [username/email] [password]
 
 RSS / ATOM
 
-    ruby application.rb add rss http://path.com/url/to/rss/feed
-    ruby application.rb add rss http://path.com/url/to/rss/feed [username] [password]  # (optional un/pass)
+    ./application.rb add rss http://path.com/url/to/rss/feed
+    ./application.rb add rss http://path.com/url/to/rss/feed [username] [password]  # (optional un/pass)
 
 Subversion
 
-    ruby application.rb add [svn or subversion] http(s)://path.com/url/to/repo [username] [password]
-    ruby application.rb add subversion http://path.com/url/to/repo
-    ruby application.rb add svn https://path.com/url/to/repo [username] [password]
+    ./application.rb add [svn or subversion] http(s)://path.com/url/to/repo [username] [password]
+    ./application.rb add subversion http://path.com/url/to/repo
+    ./application.rb add svn https://path.com/url/to/repo [username] [password]
 
 GitHub
 
-    ruby application.rb add github [github commits atom URL]
-    ruby application.rb add github https://github.com/JaSpr/social-notifier/commits/master.atom
+    ./application.rb add github [github commits atom URL]
+    ./application.rb add github https://github.com/JaSpr/social-notifier/commits/master.atom
 
 These commands all return a numbered list of requests in your stack,
 but you can directly query the stack without adding any new requests...
@@ -113,13 +113,13 @@ but you can directly query the stack without adding any new requests...
 
 ### LISTING REQUESTS IN THE STACK:
 
-    ruby application.rb list
+    ./application.rb list
 
 
 ### DELETING REQUESTS FROM THE STACK:
 
-    ruby application.rb delete [entry type:entry index]
-    ruby application.rb delete gmail:1
+    ./application.rb delete [entry type:entry index]
+    ./application.rb delete gmail:1
 
 After deletion, the entry number will not be reassigned, so running
 the command twice won't delete another entry.
@@ -127,7 +127,7 @@ the command twice won't delete another entry.
 
 ### STOPPING THE DAEMON:
 
-    ruby application.rb stop
+    ./application.rb stop
 
 
 #################
