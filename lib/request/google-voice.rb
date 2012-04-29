@@ -49,7 +49,7 @@ module SocialNotifier
 
       # send the request
       def send
-        begin
+        #begin
           # delete any previous messages
           @messages = []
 
@@ -70,9 +70,9 @@ module SocialNotifier
           document.css('.gc-message-unread').each do |message|
             @messages.push SocialNotifier::Request::Message::GoogleVoice.new(method, message)
           end
-        rescue => exc
-          response = exc
-        end
+        #rescue => exc
+        #  response = exc
+        #end
 
         process_response response
       end
@@ -169,9 +169,10 @@ module SocialNotifier
         http = Net::HTTP.new(url.host,443)
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        response,content = http.post(url.path,data,header)
+
+        response = http.post(url.path,data,header)
         case response
-          when Net::HTTPSuccess     then content
+          when Net::HTTPSuccess     then response.read_body
           when Net::HTTPRedirection then send_post(response['location'],data,header, limit - 1)
           else
             puts response.inspect
@@ -192,9 +193,9 @@ module SocialNotifier
         http = Net::HTTP.new(url.host,url.port)
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        response,content = http.get(url.path,header)
+        response = http.get(url.path,header)
         case response
-          when Net::HTTPSuccess     then content
+          when Net::HTTPSuccess     then response.read_body
           when Net::HTTPRedirection then send_get(response['location'],header, limit - 1)
           else
             response.error!
