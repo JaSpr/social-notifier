@@ -121,7 +121,7 @@ module SocialNotifier
                 id:        entry.id,
                 title:     "#{entry.type.upcase}: #{entry.contact}  (#{entry.time})",
                 body:      entry.message_text,
-                icon_path: File.realpath("#{Dir.pwd}/assets/gvoice.png"),
+                icon_path: File.realpath("#{APPLICATION_PATH}/assets/gvoice.png"),
                 object:    entry
               }
             end

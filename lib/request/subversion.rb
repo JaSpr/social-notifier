@@ -112,7 +112,7 @@ module SocialNotifier
               id:        "#{@url}|#{entry.attr('revision')}",
               title:     "#{entry.css('author').text} | Rev. #{entry.attr('revision')}",
               body:      body.join("\n----\n"),
-              icon_path: File.realpath("#{Dir.pwd}/assets/svn.png"),
+              icon_path: File.realpath("#{APPLICATION_PATH}/assets/svn.png"),
               object:    entry
             }
 

@@ -1,7 +1,10 @@
 #!/usr/bin/ruby
 
-# set the present working directory
-Dir.chdir File.dirname File.expand_path __FILE__
+require 'etc'
+
+# set the application path and user_path
+APPLICATION_PATH = File.dirname File.expand_path __FILE__
+USER_PATH        = Etc.getpwuid.dir + "/.social-notifier"
 
 require_relative 'engine'
 require_relative 'config'

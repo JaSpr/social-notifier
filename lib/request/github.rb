@@ -63,7 +63,7 @@ module SocialNotifier
                   id:        entry_id,
                   title:     "GitHub: #{feed_title}",
                   body:      body.compact.join("\n----\n"),
-                  icon_path: File.realpath("#{Dir.pwd}/assets/github.png"),
+                  icon_path: File.realpath("#{APPLICATION_PATH}/assets/github.png"),
                   object:    entry
               }
             end

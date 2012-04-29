@@ -104,7 +104,7 @@ module SocialNotifier
                 id:        entry.id || entry.guid || entry.uuid || entry.link,
                 title:     @feed_title,
                 body:      body.compact.join("\n--\n"),
-                icon_path: File.realpath("#{Dir.pwd}/assets/rss.png"),
+                icon_path: File.realpath("#{APPLICATION_PATH}/assets/rss.png"),
                 object:    entry
             }
 

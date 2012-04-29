@@ -1,5 +1,5 @@
 #!/usr/bin/ruby
-require 'etc'
+
 require 'net/http'
 
 module SocialNotifier
@@ -81,13 +81,13 @@ module SocialNotifier
 
     # Dynamically loads the messenger object
     #
-    # @param whether or not this is the messaging server
+    # @param is_master whether or not this is the messaging server
     # @raise [ArgumentError]
     # @return [SocialNotifier::Messenger::[Mixed]]
     #
     def load_messenger(is_master=false)
       messenger_service = $app_config[:messenger_class].downcase
-      file_path = "#{Dir.pwd}/lib/messenger/#{messenger_service}.rb"
+      file_path = "#{APPLICATION_PATH}/lib/messenger/#{messenger_service}.rb"
 
       raise ArgumentError, "Invalid messenger type #{messenger_service}" unless File.file? file_path
       require(File.realpath(file_path))
@@ -103,7 +103,7 @@ module SocialNotifier
     #
     def load_notifier
       notifier_service = $app_config[:notifier_class].downcase
-      file_path = "#{Dir.pwd}/lib/notifier/#{notifier_service}.rb"
+      file_path = "#{APPLICATION_PATH}/lib/notifier/#{notifier_service}.rb"
 
       raise ArgumentError, "Invalid notifier type #{notifier_service}" unless File.file? file_path
       require(File.realpath(file_path))
@@ -243,7 +243,7 @@ module SocialNotifier
             start_request_thread request_service.to_sym
           end
 
-          file_path = "#{Dir.pwd}/lib/request/#{request_service}.rb"
+          file_path = "#{APPLICATION_PATH}/lib/request/#{request_service}.rb"
 
           raise ArgumentError, "Invalid request type #{request_service}" unless File.file? file_path
 

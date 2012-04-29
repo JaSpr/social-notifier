@@ -82,7 +82,7 @@ module SocialNotifier
                   id:        entry.id,
                   title:     "#{author[:name]} | #{entry.title}",
                   body:      body.compact.join("\n---\n"),
-                  icon_path: File.realpath("#{Dir.pwd}/assets/gmail.png"),
+                  icon_path: File.realpath("#{APPLICATION_PATH}/assets/gmail.png"),
                   object:    entry
               }
             end
