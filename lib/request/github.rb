@@ -41,7 +41,7 @@ module SocialNotifier
         elsif response and response.is_a? Nokogiri::XML::Document
 
           feed_title = response.css('feed > title').text.gsub('Recent Commits to ', '')
-          entries    = response.css('entry')[0..3]
+          entries    = response.css('entry')[0]
 
           final_response = entries.map do |entry|
 
